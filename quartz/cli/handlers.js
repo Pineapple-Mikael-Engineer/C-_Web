@@ -770,7 +770,11 @@ export async function handleSync(argv) {
       "Pulling updates from your repository. You may need to resolve some `git` conflicts if you've made changes to components or plugins.",
     )
     try {
-      gitPull(ORIGIN_NAME, QUARTZ_SOURCE_BRANCH)
+      // Pull from your repo's current branch, not the hardcoded Quartz source
+      // branch (that constant is for `update`, which pulls the framework from
+      // the upstream Quartz repo). Keeps pull symmetric with the push below.
+      const currentBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim()
+      gitPull(ORIGIN_NAME, currentBranch)
     } catch {
       console.log(
         styleText("red", "An error occurred while pulling updates from your repository.") +
