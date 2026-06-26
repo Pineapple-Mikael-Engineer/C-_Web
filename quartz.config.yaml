@@ -15,7 +15,7 @@ configuration:
     provider: null
   locale: es-ES
   # Cambia esto por tu dominio cuando publiques (p.ej. usuario.github.io/repo).
-  baseUrl: localhost:8080
+  baseUrl: pineapple-mikael-engineer.github.io/C-_Web
   ignorePatterns:
     - private
     - _private

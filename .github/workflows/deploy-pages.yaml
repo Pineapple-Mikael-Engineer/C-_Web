@@ -1,0 +1,65 @@
+name: Deploy Quartz to GitHub Pages
+
+on:
+  push:
+    branches:
+      - v5
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Permite un único despliegue concurrente; no cancela uno en curso.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (incluye el submódulo content)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # historial completo para la info de git de cada nota
+          submodules: recursive # trae las notas del repo C-_Obsidian
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Cache de plugins de Quartz
+        uses: actions/cache@v5
+        with:
+          path: .quartz/plugins
+          key: ${{ runner.os }}-plugins-${{ hashFiles('quartz.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-plugins-
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar plugins de Quartz
+        run: npx quartz plugin install
+
+      - name: Build Quartz
+        run: npx quartz build
+
+      - name: Subir artefacto de Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Desplegar a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
