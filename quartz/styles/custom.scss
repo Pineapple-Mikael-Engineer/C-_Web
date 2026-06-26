@@ -1,0 +1,408 @@
+@use "./variables.scss" as *;
+@use "sass:map";
+
+/* ============================================================================
+   Tema Obsidian → Quartz para el vault de C++
+   Replica los dos snippets del vault:
+     · modo claro  →  clion-light  (CLion / IntelliJ Light)
+     · modo oscuro →  cpp-console  (terminal azul-noche, Blue Topaz night)
+   Las variables de color base (--light, --dark, --secondary, …) salen del
+   YAML; aquí va todo lo que esas variables no pueden expresar: encabezados
+   monospace con prompts, bloques de código tipo terminal/editor, callouts
+   recoloreados, enlaces, tablas, scrollbar, etc.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   Paletas de callouts (rgb de los snippets de Obsidian)
+   --------------------------------------------------------------------------- */
+$callouts-light: (
+  "note": #2470b3,
+  "info": #1750eb,
+  "abstract": #1750eb,
+  "summary": #1750eb,
+  "tldr": #1750eb,
+  "todo": #2470b3,
+  "tip": #00627a,
+  "hint": #00627a,
+  "important": #00627a,
+  "success": #067d17,
+  "check": #067d17,
+  "done": #067d17,
+  "question": #871094,
+  "help": #871094,
+  "faq": #871094,
+  "example": #871094,
+  "warning": #b07b16,
+  "caution": #b07b16,
+  "attention": #b07b16,
+  "failure": #c7222b,
+  "fail": #c7222b,
+  "missing": #c7222b,
+  "danger": #c7222b,
+  "error": #c7222b,
+  "bug": #c7222b,
+  "quote": #6b7280,
+  "cite": #6b7280,
+);
+
+$callouts-dark: (
+  "note": #56c7e6,
+  "info": #82aaff,
+  "abstract": #82aaff,
+  "summary": #82aaff,
+  "tldr": #82aaff,
+  "todo": #56c7e6,
+  "tip": #4fd6be,
+  "hint": #4fd6be,
+  "important": #4fd6be,
+  "success": #7ee787,
+  "check": #7ee787,
+  "done": #7ee787,
+  "question": #c792ea,
+  "help": #c792ea,
+  "faq": #c792ea,
+  "example": #c792ea,
+  "warning": #ffcb6b,
+  "caution": #ffcb6b,
+  "attention": #ffcb6b,
+  "failure": #ff6b81,
+  "fail": #ff6b81,
+  "missing": #ff6b81,
+  "danger": #ff6b81,
+  "error": #ff6b81,
+  "bug": #ff6b81,
+  "quote": #74849c,
+  "cite": #74849c,
+);
+
+@mixin callout-colors($map) {
+  @each $name, $color in $map {
+    .callout[data-callout="#{$name}"] {
+      --color: #{$color};
+      --border: #{rgba($color, 0.3)};
+      --bg: #{rgba($color, 0.07)};
+    }
+  }
+}
+
+/* ===========================================================================
+   ESTRUCTURA COMÚN (independiente del tema)
+   =========================================================================== */
+
+/* Encabezados: monospace ya viene de --headerFont (JetBrains Mono) */
+article {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Callout: títulos en monospace, igual que en el vault */
+.callout-title-inner {
+  font-family: var(--codeFont);
+  letter-spacing: 0.01em;
+}
+
+/* Etiquetas (#tag) tipo "chip" */
+a.internal.tag-link {
+  font-family: var(--codeFont);
+  font-size: 0.78em;
+  border-radius: 4px;
+  padding: 0.05em 0.4em;
+}
+
+/* Separadores con degradado */
+article hr {
+  background: transparent;
+  background-image: linear-gradient(90deg, transparent, var(--lightgray), transparent);
+}
+
+/* Marcadores de lista con acento */
+article ul > li::marker {
+  color: var(--secondary);
+}
+article ol > li::marker {
+  color: var(--tertiary);
+}
+
+/* Tablas: rejilla tipo grilla de datos */
+.table-container > table {
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 0.92em;
+  th {
+    font-family: var(--codeFont);
+    font-weight: 700;
+    color: var(--dark);
+  }
+  td,
+  th {
+    border: 1px solid var(--lightgray);
+  }
+}
+
+/* Metadatos / propiedades (note-properties) en monospace */
+.popover-hint .property-key,
+.note-property-key {
+  font-family: var(--codeFont);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray);
+  border-radius: 6px;
+  border: 2px solid var(--light);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
+/* ===========================================================================
+   MODO CLARO  —  clion-light (CLion / IntelliJ Light)
+   =========================================================================== */
+:root[saved-theme="light"] {
+  article {
+    /* Encabezados: azul IDE con filo izquierdo tipo "structure view" */
+    h1 { color: #16456f; }
+    h2 { color: #1f5d99; }
+    h3 { color: #00627a; }
+    h4 { color: #2470b3; }
+    h5,
+    h6 { color: #871094; }
+
+    h1,
+    h2,
+    h3 {
+      border-left: 3px solid #2470b3;
+      padding-left: 0.5em;
+    }
+    h1,
+    h2 {
+      border-bottom: 1px solid var(--lightgray);
+      padding-bottom: 0.2em;
+    }
+
+    strong {
+      color: #000000;
+    }
+    em {
+      color: #00627a;
+    }
+  }
+
+  /* Código en línea */
+  article :not(pre) > code {
+    background: #eef1f5;
+    color: #1c1f24;
+    border: 1px solid var(--lightgray);
+    padding: 0.08em 0.4em;
+    font-size: 0.88em;
+  }
+
+  /* Bloques de código: panel de editor CLion (claro, con sombra) */
+  article [data-rehype-pretty-code-figure] pre {
+    background: #ffffff;
+    border: 1px solid var(--lightgray);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(20, 30, 50, 0.07);
+  }
+  /* Números de línea en gris de canaleta */
+  article [data-rehype-pretty-code-figure] pre > code > [data-line]::before {
+    color: #b0b6c0;
+  }
+
+  /* Citas */
+  article blockquote {
+    background: #f3f6fa;
+    border-left: 3px solid #2470b3;
+    border-radius: 0 6px 6px 0;
+    color: #4a5568;
+    font-style: italic;
+  }
+
+  /* Tablas */
+  .table-container > table th {
+    background: #eceef2;
+    color: #1f5d99;
+  }
+  .table-container > table tr:nth-child(even) td {
+    background: #f8f9fb;
+  }
+  .table-container > table tr:hover td {
+    background: #eef4fb;
+  }
+
+  /* Etiquetas */
+  a.internal.tag-link {
+    background: #e7f0fa;
+    color: #2470b3;
+    border: 1px solid rgba(36, 112, 179, 0.3);
+  }
+
+  /* Enlaces internos: subrayado sutil estilo Obsidian (sin caja) */
+  article a.internal {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(36, 112, 179, 0.35);
+    border-radius: 0;
+    padding: 0;
+  }
+  article a.internal:hover {
+    border-bottom-color: #0033b3;
+  }
+
+  ::selection {
+    background: #a6d2ff;
+  }
+
+  @include callout-colors($callouts-light);
+}
+
+/* ===========================================================================
+   MODO OSCURO  —  cpp-console (terminal azul-noche / Blue Topaz night)
+   =========================================================================== */
+:root[saved-theme="dark"] {
+  article {
+    /* Encabezados con prompt de terminal y glow */
+    h1 {
+      color: #56c7e6;
+      text-shadow: 0 0 22px rgba(86, 199, 230, 0.28);
+    }
+    h2 { color: #4fd6be; }
+    h3 { color: #7ee787; }
+    h4 { color: #82aaff; }
+    h5,
+    h6 { color: #c792ea; }
+
+    /* Prompt "$ › //" delante de los encabezados */
+    h1::before,
+    h2::before,
+    h3::before {
+      color: var(--gray);
+      font-weight: 700;
+      opacity: 0.6;
+      margin-right: 0.5em;
+    }
+    h1::before { content: "$"; }
+    h2::before { content: "\203A"; } /* › */
+    h3::before { content: "//"; }
+
+    h1,
+    h2 {
+      border-bottom: 1px solid var(--lightgray);
+      padding-bottom: 0.25em;
+    }
+
+    strong {
+      color: #e6eefc;
+    }
+    em {
+      color: #4fd6be;
+    }
+  }
+
+  /* Código en línea: verde terminal sobre fondo casi negro */
+  article :not(pre) > code {
+    background: #04070e;
+    color: #7ee787;
+    border: 1px solid var(--lightgray);
+    padding: 0.08em 0.4em;
+    font-size: 0.88em;
+  }
+
+  /* Bloques de código: ventana de terminal (fondo, sombra, semáforo) */
+  article [data-rehype-pretty-code-figure] {
+    position: relative;
+  }
+  article [data-rehype-pretty-code-figure] pre {
+    background: #04070e;
+    border: 1px solid var(--lightgray);
+    border-radius: 8px;
+    padding-top: 2.2rem;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(86, 199, 230, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  }
+  /* Tres "luces" tipo terminal arriba a la izquierda */
+  article [data-rehype-pretty-code-figure] pre::before {
+    content: "";
+    position: absolute;
+    top: 0.85rem;
+    left: 1rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #ff5f56;
+    box-shadow: 18px 0 0 #ffbd2e, 36px 0 0 #27c93f;
+    z-index: 1;
+  }
+  /* Barra divisoria de la "ventana" */
+  article [data-rehype-pretty-code-figure] pre::after {
+    content: "";
+    position: absolute;
+    top: 1.95rem;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--lightgray);
+  }
+  /* Números de línea atenuados */
+  article [data-rehype-pretty-code-figure] pre > code > [data-line]::before {
+    color: #4a5a72;
+  }
+
+  /* Citas */
+  article blockquote {
+    background: #0e1626;
+    border-left: 3px solid #56c7e6;
+    border-radius: 0 6px 6px 0;
+    color: #74849c;
+    font-style: italic;
+  }
+
+  /* Tablas */
+  .table-container > table th {
+    background: #070b14;
+    color: #56c7e6;
+  }
+  .table-container > table tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.015);
+  }
+  .table-container > table tr:hover td {
+    background: rgba(86, 199, 230, 0.05);
+  }
+
+  /* Etiquetas */
+  a.internal.tag-link {
+    background: rgba(86, 199, 230, 0.1);
+    color: #56c7e6;
+    border: 1px solid rgba(86, 199, 230, 0.3);
+  }
+
+  /* Enlaces internos: subrayado discontinuo estilo Obsidian (sin caja) */
+  article a.internal {
+    background-color: transparent;
+    border-bottom: 1px dashed rgba(86, 199, 230, 0.4);
+    border-radius: 0;
+    padding: 0;
+  }
+  article a.internal:hover {
+    border-bottom-color: #4fd6be;
+  }
+
+  ::selection {
+    background: rgba(86, 199, 230, 0.25);
+  }
+
+  @include callout-colors($callouts-dark);
+}
